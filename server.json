@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.trooth-eng/trooth-network",
+  "description": "Check any company's witnessed trust record on the Trooth Network, live and read-only.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/trooth-llc/trooth-os-worker-f",
+    "source": "github"
+  },
+  "websiteUrl": "https://trooth.co",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.trooth.co/public/mcp"
+    }
+  ]
+}
