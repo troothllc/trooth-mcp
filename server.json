@@ -1,13 +1,14 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.trooth-eng/trooth-network",
-  "description": "Check any company's witnessed trust record on the Trooth Network, live and read-only.",
-  "version": "1.0.0",
+  "title": "Trooth",
+  "description": "Look up a software company's witnessed, signed Trust Profile on the Trooth Network, take a live neutral read of a domain's public security surface, or verify a signed Trust Ledger Token. Read only, public data, no key.",
+  "version": "1.1.0",
+  "websiteUrl": "https://trooth.co",
   "repository": {
-    "url": "https://github.com/trooth-llc/trooth-os-worker-f",
+    "url": "https://github.com/troothllc/trooth-mcp",
     "source": "github"
   },
-  "websiteUrl": "https://trooth.co",
   "remotes": [
     {
       "type": "streamable-http",
