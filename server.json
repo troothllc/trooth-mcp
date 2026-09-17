@@ -3,7 +3,7 @@
   "name": "io.github.trooth-eng/trooth-network",
   "title": "Trooth",
   "description": "Look up a witnessed Trust Profile, read a domain's security surface, or verify a Trust Ledger Token.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "websiteUrl": "https://trooth.co",
   "repository": {
     "url": "https://github.com/troothllc/trooth-mcp",
