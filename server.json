@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.trooth-eng/trooth-network",
   "title": "Trooth",
-  "description": "Trooth is an infrastructure & cybersecurity company providing Machine-Readable Trust.",
-  "version": "1.1.2",
+  "description": "Trooth is an infrastructure and cybersecurity company providing Machine-Readable Trust.",
+  "version": "1.1.3",
   "websiteUrl": "https://trooth.co",
   "repository": {
     "url": "https://github.com/troothllc/trooth-mcp",
