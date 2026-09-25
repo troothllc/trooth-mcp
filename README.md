@@ -6,7 +6,7 @@ Trooth operates the Trooth Network: one public, signed, machine-readable record 
 
 DNS says where a company is. A TLS certificate says the connection is authentic. The Trooth Network says who the company is and what it does with your data.
 
-**Trooth witnesses and dates facts. It does not score, rate, rank or certify anyone.** No tool here returns a number that sums a company up, and no such number exists. An agent that wants one is being asked to invent it.
+**Trooth witnesses and dates facts. It does not grade, rate or rank anyone.** No tool here returns a number that sums a company up, and no such number exists. An agent that wants one is being asked to invent it.
 
 ## What is in this repository
 
