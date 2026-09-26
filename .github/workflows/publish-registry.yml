@@ -1,0 +1,135 @@
+name: Publish the registry record
+
+# Publishes server.json to the official MCP Registry as
+# io.github.troothllc/trooth-network, from this repository, with no secret.
+#
+# WHY THIS WORKFLOW EXISTS (D-046 in the site repository's defect register).
+# The registry's GitHub OIDC sign-in grants exactly one namespace,
+# io.github.<repository owner>/*, taken from the token's repository_owner
+# claim. A workflow here is therefore granted io.github.troothllc/*, which is
+# the organization that owns this repository and the name server.json now
+# carries. The previous record, io.github.trooth-eng/trooth-network, lives under
+# a personal account and could only ever be published by that one person at a
+# device sign-in. It is superseded, not deleted.
+#
+# It runs only when someone starts it. The founder's script passes the
+# mcp-publisher release to install as publisher_version: the release installed
+# on the founder's machine, which is the one the ship has published with.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publisher_version:
+        description: "mcp-publisher release to install, as a plain number such as 1.2.3"
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: publish-registry
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: The record name is inside the namespace this workflow is granted
+        run: |
+          set -euo pipefail
+          name="$(jq -r .name server.json)"
+          version="$(jq -r .version server.json)"
+          want="io.github.${GITHUB_REPOSITORY_OWNER}/"
+          case "$name" in
+            "$want"*) echo "server.json is $name $version, inside ${want}*, the namespace GitHub OIDC grants a workflow in this repository." ;;
+            *) echo "::error::server.json names $name, which is outside ${want}*. The registry would refuse it."; exit 1 ;;
+          esac
+
+      - name: Install mcp-publisher ${{ inputs.publisher_version }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          V: ${{ inputs.publisher_version }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$V" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::publisher_version must be a plain release number such as 1.2.3; got '$V'."
+            exit 1
+          fi
+          cd "$RUNNER_TEMP"
+          ASSET="mcp-publisher_linux_amd64.tar.gz"
+          gh api "repos/modelcontextprotocol/registry/releases/tags/v$V" > release.json
+          url="$(jq -r --arg n "$ASSET" '.assets[] | select(.name == $n) | .browser_download_url' release.json)"
+          if [ -z "$url" ]; then
+            echo "::error::release v$V has no asset named $ASSET. Its assets are:"
+            jq -r '.assets[].name' release.json
+            exit 1
+          fi
+          curl -fsSL --retry 3 -o "$ASSET" "$url"
+          # The checksum the release itself publishes, when it publishes one.
+          # First a checksums file among the release assets, then the SHA-256
+          # digest GitHub records for the asset. With neither, the install is
+          # pinned by version only, and the log says so.
+          sums="$(jq -r '.assets[] | select(.name | test("checksums.*\\.txt$")) | .browser_download_url' release.json | head -n 1)"
+          digest="$(jq -r --arg n "$ASSET" '.assets[] | select(.name == $n) | .digest // empty' release.json)"
+          if [ -n "$sums" ]; then
+            curl -fsSL --retry 3 -o checksums.txt "$sums"
+            awk -v a="$ASSET" '$2 == a || $2 == "*" a' checksums.txt > want.txt
+            if [ ! -s want.txt ]; then
+              echo "::error::the release's checksums file does not list $ASSET."
+              exit 1
+            fi
+            sha256sum -c want.txt
+            echo "mcp-publisher v$V: checked against the release's checksums file."
+          elif [ -n "$digest" ]; then
+            case "$digest" in
+              sha256:*) echo "${digest#sha256:}  $ASSET" | sha256sum -c - ;;
+              *) echo "::error::the asset digest is not SHA-256: $digest"; exit 1 ;;
+            esac
+            echo "mcp-publisher v$V: checked against the SHA-256 digest GitHub records for the release asset."
+          else
+            echo "::warning::release v$V publishes no checksum for $ASSET; it is installed pinned by version only."
+          fi
+          tar -xzf "$ASSET" mcp-publisher
+          sudo install -m 0755 mcp-publisher /usr/local/bin/mcp-publisher
+          mcp-publisher --version || true
+
+      - name: Sign in with GitHub OIDC
+        run: mcp-publisher login github-oidc
+
+      - name: Publish
+        run: mcp-publisher publish
+
+      - name: Read the record back from the registry
+        run: |
+          set -euo pipefail
+          name="$(jq -r .name server.json)"
+          version="$(jq -r .version server.json)"
+          rows=""
+          for attempt in 1 2 3 4 5 6; do
+            body="$(curl -fsS --max-time 20 "https://registry.modelcontextprotocol.io/v0/servers?search=$name" || true)"
+            rows="$(printf '%s' "$body" | jq -r --arg n "$name" '
+              .servers[]? | (.server // .) as $s | (._meta["io.modelcontextprotocol.registry/official"] // {}) as $m
+              | select($s.name == $n)
+              | "\($s.version) \($m.status // "?")\(if $m.isLatest == true then " latest" else "" end)"' 2>/dev/null || true)"
+            if printf '%s\n' "$rows" | grep -q "^$version "; then
+              echo "The registry serves $name:"
+              printf '%s\n' "$rows" | sed 's/^/  /'
+              {
+                echo "### $name"
+                echo
+                printf '%s\n' "$rows" | sed 's/^/- /'
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::the registry does not list $name $version after the publish. It answered:"
+          printf '%s\n' "${rows:-(nothing under this name)}"
+          exit 1
