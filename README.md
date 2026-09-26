@@ -104,13 +104,15 @@ There is no OAuth metadata beside it, and that absence is written down rather th
 
 ## The registry record
 
-Published as `io.github.trooth-eng/trooth-network`. `io.github.*` is the registry's GitHub-authenticated namespace, which is why no signing key and no DNS proof were ever needed.
+The current record is `io.github.troothllc/trooth-network`, named for the `troothllc` organization that owns this repository. `io.github.*` is the registry's GitHub-authenticated namespace, which is why no signing key and no DNS proof are needed.
 
-`server.json` in this repository is version `1.1.2`. **Live:** the registry read back on 2026-09-24 served `io.github.trooth-eng/trooth-network 1.1.2` as its latest version, and it points at `{"type":"streamable-http","url":"https://api.trooth.co/public/mcp"}`.
+It is published from this repository by `.github/workflows/publish-registry.yml`. The registry's GitHub OIDC sign-in grants a workflow the namespace of the repository's owner, here `io.github.troothllc/*`, so a publish needs no secret and no one person at a device sign-in. The workflow runs only when someone starts it. It installs a pinned `mcp-publisher` release, signs in with `mcp-publisher login github-oidc`, publishes `server.json`, and reads the record back from the registry.
 
-The manifest version and the running server's version are two different numbers on purpose, and since 2026-09-17 they have not matched: the publish was refused with `400 cannot-publish-duplicate-version` because `1.1.0` was already on the registry, so the payload went out as `1.1.1` while the Worker kept reporting `1.1.0`. `1.1.2`, published 2026-09-19, changed the description, and the Worker still reports `1.1.0`. Both numbers are recorded on every verification run, so a drift shows up in its report.
+`server.json` in this repository is version `1.1.4`, the first version under the organization's name. Until the registry serves it, `https://trooth.co/.well-known/mcp.json` declares it as `registry.pendingVersion`, and the site's checks accept either name.
 
-A `1.1.3` payload is prepared in the site repository and is not published. It is the file served at `https://trooth.co/.well-known/mcp-server.json`, and its description writes out the ampersand: "Trooth is an infrastructure and cybersecurity company providing Machine-Readable Trust." Until it is published, that file and `server.json` here differ on purpose, and `https://trooth.co/.well-known/mcp.json` declares the gap as `registry.pendingVersion`.
+**The previous record** is `io.github.trooth-eng/trooth-network`, published under a personal GitHub account, and it is superseded, not deleted. **Live:** the registry read back on 2026-09-25 served its `1.1.3` as the latest version, pointing at `{"type":"streamable-http","url":"https://api.trooth.co/public/mcp"}`, the same endpoint the current record names. Its versions stay listed so a client that resolved the old name keeps working. Once the current record is read back, the old versions are marked deprecated with a message that names the current record.
+
+The manifest version and the running server's version are two different numbers on purpose, and since 2026-09-17 they have not matched: the publish was refused with `400 cannot-publish-duplicate-version` because `1.1.0` was already on the registry, so the payload went out as `1.1.1` while the Worker kept reporting `1.1.0`. `1.1.2`, published 2026-09-19, changed the description, `1.1.3`, published 2026-09-25, wrote out its ampersand, and the Worker still reports `1.1.0`. Both numbers are recorded on every verification run, so a drift shows up in its report.
 
 ## What this server does not offer
 
@@ -145,6 +147,7 @@ Named rather than quietly corrected, because a reader who acted on one of them d
 - The `status` table omitted `unavailable`. The server declares thirteen values and the table listed twelve, so a client branching exhaustively on that table had an unhandled case.
 - The `provenance` table listed six values and omitted `input_error`, which is the label on every answer any of the four tools gives to a malformed argument. It is the one a client is most likely to meet first.
 - The last published version of this file said `server.json` here and the copy served at `https://trooth.co/.well-known/mcp-server.json` both carried version `1.1.1` with different `description` fields, and that the registry held `1.1.1`. That was out of date: `server.json` here and the registry's latest record are now both `1.1.2`, published 2026-09-19; the website's copy is the prepared, unpublished `1.1.3` described under The registry record.
+- The last published version of this file said `server.json` here was `1.1.2` and that a `1.1.3` payload was prepared and not published. That was out of date: `server.json` here carried `1.1.3`, which was published on 2026-09-25 under the previous name. It now carries `1.1.4` under the organization's name, described under The registry record.
 - The last published version of this file said the organization profile claims every public Trooth repository is Apache 2.0. That was out of date. `LICENSE` in this repository is MIT, every other repository in the profile's table is Apache 2.0, and the profile now says so: every repository in its table is Apache 2.0 except `trooth-mcp`, which is MIT.
 
 ## Security
