@@ -2,9 +2,27 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.troothllc/trooth-network",
   "title": "Trooth",
-  "description": "Trooth is an infrastructure and cybersecurity company providing Machine-Readable Trust.",
-  "version": "1.1.4",
+  "description": "Machine-Readable Company Profiles: search, read and compare any company's Trust Profile.",
+  "version": "1.1.5",
   "websiteUrl": "https://trooth.co",
+  "icons": [
+    {
+      "src": "https://trooth.co/brand/trooth-badge-light-512.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ],
+      "theme": "light"
+    },
+    {
+      "src": "https://trooth.co/brand/trooth-badge-dark-512.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ],
+      "theme": "dark"
+    }
+  ],
   "repository": {
     "url": "https://github.com/troothllc/trooth-mcp",
     "source": "github"
