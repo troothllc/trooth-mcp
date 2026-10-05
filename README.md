@@ -24,7 +24,7 @@ Everything below was read from a committed file. The lines marked **live** were 
 | Method | `POST` only. **Live:** `GET` and `DELETE` both answer 405 with a JSON body saying so. |
 | Transport | Streamable HTTP, JSON-RPC 2.0, one JSON response per POST. No SSE stream, no batches. **Live:** a batch request is refused with `-32600`, malformed JSON with `-32700`. |
 | Sessions | None, under any revision. **Live:** no `Mcp-Session-Id` header is ever minted. |
-| Authentication | **None.** No key, no cookie, no account. |
+| Authentication | **None for the public tools.** No key, no cookie, no account. One more tool, `trooth_my_company_record`, reads the caller's own workspace and needs an OAuth access token for this server from the authorization server named in its protected-resource metadata (WorkOS AuthKit); no scope is required. Live since 2026-10-05; see Discovery below. |
 | Protocol revision | `2026-07-28` is what the server leads with. `2025-06-18`, `2025-03-26` and `2024-11-05` are still answered in full. **Live:** `server/discover` returned exactly those four. |
 | Server identity | **Live:** `serverInfo` is `{"name":"trooth-mcp","version":"1.1.0"}`. |
 | Capabilities | **Live:** `{"tools":{"listChanged":false},"resources":{"listChanged":false,"subscribe":false},"prompts":{"listChanged":false}}` and nothing else. |
@@ -100,7 +100,7 @@ Prompts: `vendor_trust_check`, `verify_trust_token`, `before_you_trust`.
 
 `https://trooth.co/.well-known/mcp.json` is Trooth's own descriptor, and that file says so in its own first line. **MCP defines no `.well-known` path for advertising a server.** The specification's answer to "what is this server" is the in-band `server/discover` RPC, which needs the URL you already have, and a Server Card document is an active working-group proposal (SEP-2127, Draft) whose experimental shape is `GET <mcp-url>/server-card`, not that path. The descriptor is published because a fixed address a person or an agent can guess is worth having, and it is named as Trooth's own so nobody cites it as a convention.
 
-There is no OAuth metadata beside it, and that absence is written down rather than left to be discovered. The MCP specification makes an authorized HTTP server an OAuth 2.0 protected resource; none of that applies here, because this server takes no credential and the four tools read data already public to any browser. So there is no protected resource, no protected-resource metadata and no authorization server, and the descriptor's `protectedResourceMetadata` is `null` rather than a URL nobody serves.
+The OAuth metadata is not beside it, because RFC 9728 puts it on the resource's own origin: `https://api.trooth.co/.well-known/oauth-protected-resource/public/mcp`, served by the Worker. Since 2026-10-05 it answers 200 and names Trooth's WorkOS AuthKit issuer in `authorization_servers`, with no `scopes_supported`. The public tools still take no credential. For `trooth_my_company_record`, a client registers itself with that authorization server (dynamic client registration or a client ID metadata document) and requests a token with `resource=https://api.trooth.co/public/mcp` (RFC 8707). No scope is required: AuthKit does not grant custom scopes to clients that register themselves, so none is asked for. The token must come from that issuer, name this resource as its audience, carry a valid signature from the issuer's published keys, be unexpired, and carry a client and a subject. The tool reads only the workspace linked to that subject; the link is made when the person signs in to trooth.co once with Continue with enterprise SSO, and until then the tool answers `not_linked`. A call without a token answers 401 with a `WWW-Authenticate` header naming the metadata. The token is never stored or forwarded.
 
 ## The registry record
 
@@ -120,7 +120,7 @@ The manifest version and the running server's version are two different numbers 
 
 Stated so nobody has to infer it: a client that supports the Tasks extension needs no special handling here and should offer none. All four tools are bounded reads that answer in the ordinary `tools/call` response. Trooth never returns a task handle and invents no field the revision it negotiated does not define. A client that does not support the extension is in exactly the same position, which is the point of saying so.
 
-**No authenticated surface.** There is no signed-in company or buyer an agent can act as. Nothing here writes. Earlier plans listed a further ten public tools, eight buyer tools and eight company tools; none of them is built, and the reason is the same for all of them.
+**One read-only authenticated tool, and nothing that writes.** `trooth_my_company_record` reads the signed-in person's own workspace record (name, slug, public page address) and nothing else. There is no signed-in company or buyer an agent can act as. Nothing here writes. Earlier plans listed a further ten public tools, eight buyer tools and eight company tools; none of them is built, and the reason is the same for all of them.
 
 **No unknown tool runs.** **Live:** a call to a tool that does not exist answers `-32602` and executes nothing. A call with no arguments at all degrades to `bad_input` rather than throwing.
 
