@@ -62,7 +62,7 @@ The security contract for the live read, including which hosts and addresses are
 
 ## This repository
 
-A license, this README and `server.json`, the manifest published to the official MCP Registry as `io.github.troothllc/trooth-network`. The server itself runs behind `api.trooth.co`; there is nothing here to install.
+A license, this README, `server.json`, the manifest published to the official MCP Registry as `io.github.troothllc/trooth-network`, and `glama.json`, which names the maintainers of the Glama directory listing. The server itself runs behind `api.trooth.co`; there is nothing here to install.
 
 `server.json` in this repository is version `1.1.5`. The registry manifest and the running server carry separate version numbers: the server reports its own in `serverInfo`.
 
