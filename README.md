@@ -12,6 +12,8 @@ Trooth operates the Trooth Network: one public, machine-readable record per comp
 
 **Trooth witnesses and dates facts. It does not grade, rate or rank anyone.** No tool here returns a number that sums a company up.
 
+> **Is your company on the Trooth Network?** Any company can publish one free, public record that buyers, and the AI assistants they use, read directly. **[Claim your company's record](https://trooth.co/signup)** · [See an example](https://trooth.co/network/company/trooth)
+
 ## Quick start
 
 | Client | How to add it |
