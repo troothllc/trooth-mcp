@@ -1,176 +1,77 @@
 # trooth-mcp
 
-The Trooth Network over the Model Context Protocol. Four read-only tools, public data, no key.
+The Trooth Network over the Model Context Protocol. Read any company's public record from Claude, ChatGPT, Cursor, VS Code or any MCP client. No key, no account.
 
-Trooth operates the Trooth Network: one public, signed, machine-readable record per company, carrying its identity, products and demos, commercial terms, domain and marketing links, people, documents, security and privacy posture, AI practices, procurement terms and relationships. It is Trooth's only product and it is free.
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.troothllc%2Ftrooth--network-1A73E8)](https://registry.modelcontextprotocol.io) [![License: MIT](https://img.shields.io/badge/license-MIT-0B0B0B)](LICENSE) [![Docs](https://img.shields.io/badge/docs-trooth.co%2Fdocs%2Fagents-0B0B0B)](https://trooth.co/docs/agents)
 
-DNS says where a company is. A TLS certificate says the connection is authentic. The Trooth Network says who the company is and what it does with your data.
+```
+https://api.trooth.co/public/mcp
+```
 
-**Trooth witnesses and dates facts. It does not grade, rate or rank anyone.** No tool here returns a number that sums a company up, and no such number exists. An agent that wants one is being asked to invent it.
+Trooth operates the Trooth Network: one public, machine-readable record per company, carrying its identity, products, commercial terms, people, documents, security and privacy posture, AI practices, procurement terms and relationships. Every item says who said it. It is Trooth's only product, and it is free.
 
-## What is in this repository
+**Trooth witnesses and dates facts. It does not grade, rate or rank anyone.** No tool here returns a number that sums a company up.
 
-A license, this README and `server.json`. There is no server code here, and there is nothing to install.
+## Quick start
 
-The server runs in the Worker behind `api.trooth.co`, which is a different repository. `server.json` is the manifest published to the official MCP Registry. What this repository is, therefore, is the registry record plus the description of a surface that lives somewhere else, and the honest thing to do is say which of the two any given fact came from.
+| Client | How to add it |
+| --- | --- |
+| Claude (claude.ai, Desktop, mobile) | Customize › Connectors › + › Add custom connector, paste the URL above, and choose No sign-in. |
+| ChatGPT | Trooth Network is listed in ChatGPT's app directory. To add the URL yourself, turn on Developer mode, then add it under Plugins. |
+| Claude Code | `claude mcp add --transport http trooth https://api.trooth.co/public/mcp` |
+| Cursor | Add `"trooth": { "url": "https://api.trooth.co/public/mcp" }` under `mcpServers` in `.cursor/mcp.json`. |
+| VS Code | Run **MCP: Add Server** and paste the URL above, or add it to a project's `.mcp.json`. |
 
-Everything below was read from a committed file. The lines marked **live** were observed against the endpoint itself on 2026-09-24 by Trooth's verification script (`scripts/verify-public-mcp.mjs` in the site repository, not in this one), which writes its report to `docs/rebuild-package/PUBLIC_MCP_VERIFICATION.md` there. In that run nothing failed: the report lists 85 results that matched what was expected and 11 informational readings. That run is anonymous, from one network location, and says nothing about a later time.
+Then ask in plain words: *"Read trooth.co's Trust Profile and tell me how it handles customer data."*
 
-## The endpoint
+Every client's current steps, with install links, are at [trooth.co/docs/agents](https://trooth.co/docs/agents).
+
+## Tools
+
+Eight tools, all read only. Each answers with prose for a person and the same answer as typed `structuredContent` for a machine.
+
+| Tool | What it reads | Cost |
+| --- | --- | --- |
+| `trooth_search_companies` | Search the Network by name, domain, tagline or category. | 1 |
+| `trooth_public_trust_profile` | One company's complete Trust Profile, section by section, by domain or Trooth slug. | 1 |
+| `trooth_compare_companies` | Two to four companies side by side, section by section. | 2 |
+| `trooth_ai_data_use_disclosures` | What a company has declared about AI and customer data. | 1 |
+| `trooth_outside_in_read` | A live read of a domain's public HTTPS surface and `security.txt`, taken when called. | 4 |
+| `trooth_verify` | Checks the two signatures on a Trust Ledger Token. | 1 |
+| `trooth_ask` | Answers a question about Trooth itself from Trooth's fixed reference text. | 1 |
+| `trooth_my_company_record` | Your own workspace's record. Needs sign-in (OAuth). | 1 |
+
+A section a company left empty comes back as **not published**, never filled in. A company Trooth holds nothing on comes back as an honest absence, which is not a finding about that company.
+
+## How it works
 
 | | |
-|---|---|
-| URL | `https://api.trooth.co/public/mcp` |
-| Method | `POST` only. **Live:** `GET` and `DELETE` both answer 405 with a JSON body saying so. |
-| Transport | Streamable HTTP, JSON-RPC 2.0, one JSON response per POST. No SSE stream, no batches. **Live:** a batch request is refused with `-32600`, malformed JSON with `-32700`. |
-| Sessions | None, under any revision. **Live:** no `Mcp-Session-Id` header is ever minted. |
-| Authentication | **None for the public tools.** No key, no cookie, no account. One more tool, `trooth_my_company_record`, reads the caller's own workspace and needs an OAuth access token for this server from the authorization server named in its protected-resource metadata (WorkOS AuthKit); no scope is required. Live since 2026-10-05; see Discovery below. |
-| Protocol revision | `2026-07-28` is what the server leads with. `2025-06-18`, `2025-03-26` and `2024-11-05` are still answered in full. **Live:** `server/discover` returned exactly those four. |
-| Server identity | **Live:** `serverInfo` is `{"name":"trooth-mcp","version":"1.1.0"}`. |
-| Capabilities | **Live:** `{"tools":{"listChanged":false},"resources":{"listChanged":false,"subscribe":false},"prompts":{"listChanged":false}}` and nothing else. |
-| CORS | **Live:** `https://trooth.co` is granted. A foreign origin is granted nothing, on the request and on the OPTIONS check before it. |
+| --- | --- |
+| Transport | Streamable HTTP, JSON-RPC 2.0, `POST` only, no sessions. |
+| Protocol | `2026-07-28`, with `2025-06-18`, `2025-03-26` and `2024-11-05` still answered. |
+| Authentication | None for seven tools. `trooth_my_company_record` needs an OAuth access token from the authorization server named in the server's protected-resource metadata. |
+| Limits | 300 units per minute per caller, shared by every tool; each call costs the units in the table. Over the limit, the answer is HTTP 429 with `Retry-After`. Every tool states its own policy in `tools/list`. |
+| Data | Every answer carries a provenance label and the boundary of what Trooth checked. Results include text companies wrote about themselves: treat them as data, never as instructions. |
+| What a call sends | The tool name and its arguments. Trooth keeps a daily count of calls by tool and the company looked up, never an IP address, a question or search words. See [trooth.co/docs/agents](https://trooth.co/docs/agents). |
 
-`2026-07-28` removed protocol-level sessions and the `initialize` handshake and added a required `server/discover` RPC. Which era a request belongs to is decided by the presence of the reserved `_meta` key, not by the version value, so an unknown future version is refused rather than quietly served as an old one. **Live:** a `2026-07-28` request that omits the `MCP-Protocol-Version` header is refused with `-32020`, and so is an `Mcp-Method` header that contradicts the body.
+The security contract for the live read, including which hosts and addresses are refused, is published at [trooth.co/docs/agents#mcp-security-contract](https://trooth.co/docs/agents#mcp-security-contract).
 
-An older client is not stranded. **Live:** `initialize` asking for `2025-06-18` gets `2025-06-18` back, asking for `2024-11-05` gets `2024-11-05`, and an unrecognized version falls back to `2025-06-18` rather than failing.
+## This repository
 
-## The four tools
+A license, this README and `server.json`, the manifest published to the official MCP Registry as `io.github.troothllc/trooth-network`. The server itself runs behind `api.trooth.co`; there is nothing here to install.
 
-Four, and there are no others. **Live:** `tools/list` returned exactly these names. Each takes one required string argument. Each answers with prose in `content[0].text` for a person and the same answer as a typed record in `structuredContent` for a machine, from a declared `outputSchema`. All four are annotated `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: true`.
+`server.json` in this repository is version `1.1.5`. The registry manifest and the running server carry separate version numbers: the server reports its own in `serverInfo`.
 
-### `trooth_public_trust_profile`
+## Related
 
-Argument `company`: a domain or a Trooth slug.
-
-Returns the company's published Trust Profile if it has one. A profile Trooth has witnessed comes back as `witnessed_signed`, with the date it was last witnessed where the record carries one; a published profile with nothing witnessed comes back as `self_declared`, the company's own words. A company listed in the public directory without a published profile comes back with its directory entry, labeled `signed_scan` (the API's name for that provenance). When Trooth holds nothing, the answer is an honest absence carrying `provenance: "honest_absence"` and a `claim_url`, which is not a guess and not a negative finding about the company.
-
-It reads the same source as `GET https://trooth.co/api/network/profile?q=`, deliberately, so the machine answer and the human page are built from the same record. The Worker caches that read for up to 120 seconds, so a change can take that long to appear here.
-
-### `trooth_outside_in_read`
-
-Argument `domain`.
-
-A neutral read of that domain's public surface at the moment of the call: HTTPS and TLS reachability, the common security headers, `security.txt`. These are **observations**. They are not witnessed evidence, they are not a grade, and the response labels them that way. An outside-in read says what a stranger can see from the internet. It says nothing about what the company runs.
-
-The input is hardened, and this is the one tool where that matters, because it is the only one that makes an outbound request on a caller's behalf. **Live:** an IPv4 literal, an IPv6 literal, `localhost`, the cloud metadata address `169.254.169.254`, a hostname resolving into `10.0.0.0/8` and a hostname resolving to loopback are each refused as `bad_input` with the reason named. A URL is reduced to its host before anything is read.
-
-### `trooth_verify`
-
-Argument `token`: a Trust Ledger Token in `tlt2.` or `tlt.` form, or its JTI.
-
-Re-runs both signatures and answers `valid`, `expired`, `revoked` or `invalid`, the last when a signature does not match, which the answer tells you to treat as tampered. The limit travels in the answer: Trooth's signature covers the signing event and the payload at issuance, and never the truthfulness of the claims inside it. A caller that reads a valid token as proof that its claims are true has made the one mistake this product exists to prevent.
-
-**Live:** an unknown token and outright garbage both come back as an honest absence. Neither is ever reported valid.
-
-### `trooth_ask`
-
-Argument `question`.
-
-Answers questions about Trooth itself: what the Network is, what one record carries, what it costs, how witnessing works. It is not a question-answering service about a company; a question about a company is answered by the three tools above, which cite what they read. **Live:** a question outside the curated corpus comes back `out_of_scope` rather than invented.
-
-## What comes back
-
-`structuredContent` carries `status`, `provenance`, `subject`, `summary` and, where it applies, `claim_url`. **Live:** the `status` enum the server declares is exactly:
-
-```
-published  listed  unclaimed  private  observed  valid  invalid
-expired  revoked  answered  out_of_scope  bad_input  unavailable
-```
-
-`provenance` is the label that keeps an observation from being read as a proof. The values the verification script holds the server to are `witnessed_signed`, `signed_scan`, `live_observation`, `honest_absence`, `withheld_by_owner`, `knowledge_base`, `input_error`, `self_declared` and `read_failed`. The live run exercised five of them: `witnessed_signed`, `live_observation`, `honest_absence`, `knowledge_base` and `input_error`, the last on every malformed argument.
-
-Two states stay deliberately apart, and collapsing them would misrepresent a company:
-
-- `unclaimed` with `honest_absence` means Trooth holds no record. That is an absence of evidence, not a finding.
-- `private` with `withheld_by_owner` means a record exists and its owner chose not to publish it. That is a decision, not missing data.
-
-## Resources and prompts
-
-**Live:** three of each.
-
-| Resource | |
-|---|---|
-| `trooth://methodology` | what witnessed means, how an outside-in read differs from signed evidence, and what an honest absence is |
-| `trooth://provenance-labels` | what each provenance label an agent sees here means |
-| `trooth://verify-a-vendor` | the four-step reading sequence |
-
-Prompts: `vendor_trust_check`, `verify_trust_token`, `before_you_trust`.
-
-## Discovery
-
-`https://trooth.co/.well-known/mcp.json` is Trooth's own descriptor, and that file says so in its own first line. **MCP defines no `.well-known` path for advertising a server.** The specification's answer to "what is this server" is the in-band `server/discover` RPC, which needs the URL you already have, and a Server Card document is an active working-group proposal (SEP-2127, Draft) whose experimental shape is `GET <mcp-url>/server-card`, not that path. The descriptor is published because a fixed address a person or an agent can guess is worth having, and it is named as Trooth's own so nobody cites it as a convention.
-
-The OAuth metadata is not beside it, because RFC 9728 puts it on the resource's own origin: `https://api.trooth.co/.well-known/oauth-protected-resource/public/mcp`, served by the Worker. Since 2026-10-05 it answers 200 and names Trooth's WorkOS AuthKit issuer in `authorization_servers`, with no `scopes_supported`. The public tools still take no credential. For `trooth_my_company_record`, a client registers itself with that authorization server (dynamic client registration or a client ID metadata document) and requests a token with `resource=https://api.trooth.co/public/mcp` (RFC 8707). No scope is required: AuthKit does not grant custom scopes to clients that register themselves, so none is asked for. The token must come from that issuer, name this resource as its audience, carry a valid signature from the issuer's published keys, be unexpired, and carry a client and a subject. The tool reads only the workspace linked to that subject; the link is made when the person signs in to trooth.co once with Continue with enterprise SSO, and until then the tool answers `not_linked`. A call without a token answers 401 with a `WWW-Authenticate` header naming the metadata. The token is never stored or forwarded.
-
-## The registry record
-
-The current record is `io.github.troothllc/trooth-network`, named for the `troothllc` organization that owns this repository. `io.github.*` is the registry's GitHub-authenticated namespace, which is why no signing key and no DNS proof are needed.
-
-It is published from this repository by `.github/workflows/publish-registry.yml`. The registry's GitHub OIDC sign-in grants a workflow the namespace of the repository's owner, here `io.github.troothllc/*`, so a publish needs no secret and no one person at a device sign-in. The workflow runs only when someone starts it. It installs a pinned `mcp-publisher` release, signs in with `mcp-publisher login github-oidc`, publishes `server.json`, and reads the record back from the registry.
-
-`server.json` in this repository is version `1.1.4`, the first version under the organization's name. Until the registry serves it, `https://trooth.co/.well-known/mcp.json` declares it as `registry.pendingVersion`, and the site's checks accept either name.
-
-**The previous record** is `io.github.trooth-eng/trooth-network`, published under a personal GitHub account, and it is superseded. **Live:** the registry read back on 2026-09-25 served its `1.1.3` as the latest version, pointing at `{"type":"streamable-http","url":"https://api.trooth.co/public/mcp"}`, the same endpoint the current record names. The registry gives one endpoint to one record: it refuses a record whose remote URL a version of another record still uses, and only a version marked deleted releases it, deprecated or not. The first publish under the current name was refused for exactly that reason. So before the publish, every version of the previous record is marked deleted, with a message that names the current record. Deleted is a status on the registry, not an erasure: the versions are kept and can be restored, and if the publish had failed they would have been put back as they were.
-
-The manifest version and the running server's version are two different numbers on purpose, and since 2026-09-17 they have not matched: the publish was refused with `400 cannot-publish-duplicate-version` because `1.1.0` was already on the registry, so the payload went out as `1.1.1` while the Worker kept reporting `1.1.0`. `1.1.2`, published 2026-09-19, changed the description, `1.1.3`, published 2026-09-25, wrote out its ampersand, and the Worker still reports `1.1.0`. Both numbers are recorded on every verification run, so a drift shows up in its report.
-
-## What this server does not offer
-
-**No long-running work, and no task handle.** `2026-07-28` changed the core lifecycle and removed sessions; it does not define a task lifecycle. Long-running work in MCP lives in a separate extension identified as `io.modelcontextprotocol/tasks`, published in draft beside the revision rather than inside it, and opt-in on both sides. **Live:** this server's capabilities are tools, resources and prompts and nothing else. There is no task capability and no task method. The Worker's code sets `resultType` to `"complete"` on every `2026-07-28` result.
-
-Stated so nobody has to infer it: a client that supports the Tasks extension needs no special handling here and should offer none. All four tools are bounded reads that answer in the ordinary `tools/call` response. Trooth never returns a task handle and invents no field the revision it negotiated does not define. A client that does not support the extension is in exactly the same position, which is the point of saying so.
-
-**One read-only authenticated tool, and nothing that writes.** `trooth_my_company_record` reads the signed-in person's own workspace record (name, slug, public page address) and nothing else. There is no signed-in company or buyer an agent can act as. Nothing here writes. Earlier plans listed a further ten public tools, eight buyer tools and eight company tools; none of them is built, and the reason is the same for all of them.
-
-**No unknown tool runs.** **Live:** a call to a tool that does not exist answers `-32602` and executes nothing. A call with no arguments at all degrades to `bad_input` rather than throwing.
-
-## Monitoring
-
-A scheduled job in the site repository POSTs `tools/list` to the live endpoint every five minutes (GitHub may delay a scheduled run under load). Be clear about what that proves and what it does not: it checks the HTTP status code and that each of the four tool names appears somewhere in the body, so it catches the endpoint being down or losing a tool, and would not catch an extra tool, a changed schema or a wrong answer from a tool. The catalog and the served surface are compared properly by the verification run above, which is not continuous.
-
-A test in the site repository holds the output contract published on [trooth.co/docs/agents](https://trooth.co/docs/agents) in two ways: against the `status` values the last verification run recorded, and against the Worker's `provenance` values when the Worker's repository is cloned beside it. Without that clone, its `provenance` check only confirms that the page publishes every `provenance` value the last run saw, and it says the fuller comparison was skipped. It is only as current as that last run.
-
-## Add it
-
-The steps below restate each vendor's own pages as [trooth.co/docs/agents](https://trooth.co/docs/agents) read them in September 2026. That page carries the plan limits, the removal steps and the sources.
-
-**ChatGPT:** Trooth Network is listed in the ChatGPT app directory. [Open the listing](https://chatgpt.com/plugins/plugin_asdk_app_6a9361d2ee7481919a8c706c3ff5388f); OpenAI says whether an app is offered to you depends on your plan, region, workspace and role. To add it by hand instead you need Developer mode, which OpenAI lists for Plus, Pro, Business, Enterprise and Education accounts on the web and not for the Free plan: Settings, then Security and login, then turn on Developer mode; then open Plugins, press +, give it a name and paste the endpoint.
-
-**Claude:** Customize, then Connectors, then Add custom connector, then paste the endpoint and press Add. If the dialog asks how people sign in, choose No sign-in. On Team and Enterprise an owner adds it for the organization first.
-
-**Cursor, Cline, VS Code, or any other MCP client:** add a remote MCP server pointing at `https://api.trooth.co/public/mcp`. There is no key to configure.
-
-## What earlier versions of this file got wrong
-
-Named rather than quietly corrected, because a reader who acted on one of them deserves to know which line moved.
-
-- The `status` table omitted `unavailable`. The server declares thirteen values and the table listed twelve, so a client branching exhaustively on that table had an unhandled case.
-- The `provenance` table listed six values and omitted `input_error`, which is the label on every answer any of the four tools gives to a malformed argument. It is the one a client is most likely to meet first.
-- The last published version of this file said `server.json` here and the copy served at `https://trooth.co/.well-known/mcp-server.json` both carried version `1.1.1` with different `description` fields, and that the registry held `1.1.1`. That was out of date: `server.json` here and the registry's latest record are now both `1.1.2`, published 2026-09-19; the website's copy is the prepared, unpublished `1.1.3` described under The registry record.
-- The last published version of this file said `server.json` here was `1.1.2` and that a `1.1.3` payload was prepared and not published. That was out of date: `server.json` here carried `1.1.3`, which was published on 2026-09-25 under the previous name. It now carries `1.1.4` under the organization's name, described under The registry record.
-- The last published version of this file said the organization profile claims every public Trooth repository is Apache 2.0. That was out of date. `LICENSE` in this repository is MIT, every other repository in the profile's table is Apache 2.0, and the profile now says so: every repository in its table is Apache 2.0 except `trooth-mcp`, which is MIT.
+- [trooth-cli](https://github.com/troothllc/trooth-cli): the same records from your terminal, `npx trooth check <domain>`.
+- [trooth-openapi](https://github.com/troothllc/trooth-openapi): the OpenAPI 3.1 contracts for the public API.
+- [trooth.co/docs](https://trooth.co/docs): every interface, in one place.
 
 ## Security
 
-Report a vulnerability through the [Vulnerability Disclosure Policy](https://trooth.co/security/vulnerability-disclosure-policy), or read [/.well-known/security.txt](https://trooth.co/.well-known/security.txt).
-
-This server takes no credential, so there is none to leak through it. Every tool reads data already public to any browser. The only outbound request made on a caller's behalf is `trooth_outside_in_read`, and the refusals listed against that tool above are what keeps it from being pointed at a private address.
-
-## Links
-
-- The Network: [trooth.co/network](https://trooth.co/network)
-- The agent pattern, written out: [trooth.co/docs/agents](https://trooth.co/docs/agents)
-- The descriptor: [trooth.co/.well-known/mcp.json](https://trooth.co/.well-known/mcp.json)
-- The registry payload: [trooth.co/.well-known/mcp-server.json](https://trooth.co/.well-known/mcp-server.json)
-- The API reference: [trooth.co/docs/api](https://trooth.co/docs/api)
-- How witnessing works, and what Trooth does not read: [trooth.co/methodology](https://trooth.co/methodology)
-- Verify a signature yourself: [trooth.co/verify/keys](https://trooth.co/verify/keys)
-- The command-line reader: [`troothllc/trooth-cli`](https://github.com/troothllc/trooth-cli), published on npm as **`trooth`**
-- Publish your own record, free: [trooth.co/get-started](https://trooth.co/get-started)
-- Contact: [trooth.co/contact](https://trooth.co/contact)
+Report a vulnerability to security@trooth.co. The policy is at [trooth.co/security/vulnerability-disclosure-policy](https://trooth.co/security/vulnerability-disclosure-policy) and [/.well-known/security.txt](https://trooth.co/.well-known/security.txt).
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-Trooth signs what it witnessed. It never signs on a company's behalf.
