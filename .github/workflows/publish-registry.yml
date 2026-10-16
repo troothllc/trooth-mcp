@@ -35,7 +35,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -112,8 +112,11 @@ jobs:
           name="$(jq -r .name server.json)"
           version="$(jq -r .version server.json)"
           rows=""
-          for attempt in 1 2 3 4 5 6; do
-            body="$(curl -fsS --max-time 20 "https://registry.modelcontextprotocol.io/v0/servers?search=$name" || true)"
+          # The registry can be slow right after a publish: each read gets
+          # 40 seconds and the whole read-back about seven minutes, so a slow
+          # answer is waited for instead of failing a publish that worked.
+          for attempt in $(seq 1 8); do
+            body="$(curl -fsS --max-time 40 "https://registry.modelcontextprotocol.io/v0/servers?search=$name" || true)"
             rows="$(printf '%s' "$body" | jq -r --arg n "$name" '
               .servers[]? | (.server // .) as $s | (._meta["io.modelcontextprotocol.registry/official"] // {}) as $m
               | select($s.name == $n)
@@ -128,7 +131,7 @@ jobs:
               } >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
-            sleep 5
+            sleep 15
           done
           echo "::error::the registry does not list $name $version after the publish. It answered:"
           printf '%s\n' "${rows:-(nothing under this name)}"
