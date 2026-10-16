@@ -46,7 +46,7 @@ Eleven tools, all read only. Each answers with prose for a person and the same a
 | `trooth_ask` | Answers a question about Trooth itself from Trooth's fixed reference text. | 1 |
 | `trooth_my_company_record` | Your own workspace's record. Needs sign-in (OAuth). | 1 |
 
-Every fact carries one of four provenance words: witnessed, public record, attested or declared. Only the witness statement is signed. Three negatives are kept apart: no (the record holds a negative value), not_published (the company has not published it) and not_read (Trooth's reading did not read it). Resources include `trooth://company/{company}`, `trooth://buyer-questions`, `trooth://provenance-glossary` and `trooth://schema`; prompts include `vendor_due_diligence` and `vendors_side_by_side`.
+Every fact carries one of four provenance words: witnessed, public record, attested or declared. Only the witness statement is signed on a record: Trooth signs witness statements and, for workspaces that create a delegation, delegation receipts and action evidence references; it does not sign the profile, its facts or a company's declarations. Three negatives are kept apart: no (the record holds a negative value), not_published (the company has not published it) and not_read (Trooth's reading did not read it). Resources include `trooth://company/{company}`, `trooth://buyer-questions`, `trooth://provenance-glossary` and `trooth://schema`; prompts include `vendor_due_diligence` and `vendors_side_by_side`.
 
 A section a company left empty comes back as **not published**, never filled in. A company Trooth holds nothing on comes back as an honest absence, which is not a finding about that company.
 
