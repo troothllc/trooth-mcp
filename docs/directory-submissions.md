@@ -53,7 +53,7 @@ Every tool is annotated `readOnlyHint: true`, `destructiveHint: false`, `idempot
 
 Resources: `trooth://company/{company}`, `trooth://company/{company}/{section}`, `trooth://methodology`, `trooth://provenance-glossary`, `trooth://provenance-labels`, `trooth://buyer-questions`, `trooth://schema`, `trooth://what-a-call-sends`, `trooth://verify-a-vendor`.
 
-Prompts: `vendor_due_diligence` (Vendor due diligence), `vendors_side_by_side` (Vendors side by side), `vendor_trust_check`, `before_you_trust`, `verify_trust_token`.
+Prompts: `vendor_due_diligence` (Vendor due diligence), `vendor_trust_check`, `before_you_trust`, `verify_trust_token`.
 
 ## Example prompts
 
@@ -63,8 +63,7 @@ Prompts: `vendor_due_diligence` (Vendor due diligence), `vendors_side_by_side` (
 4. "List witnessed companies on the Trooth Network in the Fintech industry with an EU data region."
 5. "What changed on trooth.co's record since 2026-10-01?"
 6. "Run vendor due diligence on example.com." (prompt `vendor_due_diligence`)
-7. "Set acme.com, globex.com and initech.com side by side on the twelve buyer questions." (prompt `vendors_side_by_side`)
-8. "Take a live read of example.com's public security headers."
+7. "Take a live read of example.com's public security headers."
 
 A reviewer needs no account. A call that always returns content: `trooth_ask` with `{"question": "What is Trooth?"}`, or `trooth_outside_in_read` with `{"domain": "example.com"}`.
 
