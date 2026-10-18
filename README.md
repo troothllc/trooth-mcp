@@ -21,12 +21,69 @@ Trooth operates the Trooth Network: one public, machine-readable record per comp
 | Claude (claude.ai, Desktop, mobile) | Customize › Connectors › + › Add custom connector, paste the URL above, and choose No sign-in. |
 | ChatGPT | Trooth Network is listed in ChatGPT's app directory. To add the URL yourself, turn on Developer mode, then add it under Plugins. |
 | Claude Code | `claude mcp add --transport http trooth https://api.trooth.co/public/mcp` |
+| Codex | `codex mcp add trooth --url https://api.trooth.co/public/mcp`, or the `~/.codex/config.toml` block below. |
+| Gemini CLI | `gemini mcp add --transport http trooth https://api.trooth.co/public/mcp`, or the `settings.json` block below. |
 | Cursor | Add `"trooth": { "url": "https://api.trooth.co/public/mcp" }` under `mcpServers` in `.cursor/mcp.json`. |
-| VS Code | Run **MCP: Add Server** and paste the URL above, or add it to a project's `.mcp.json`. |
+| VS Code | Run **MCP: Add Server** and paste the URL above, or add the block below to a project's `.vscode/mcp.json` (VS Code's key is `servers`, not `mcpServers`). |
 
 Then ask in plain words: *"Read trooth.co's Trust Profile and tell me how it handles customer data."*
 
 Every client's current steps, with install links, are at [trooth.co/docs/agents](https://trooth.co/docs/agents).
+
+### Configuration files
+
+The same blocks [trooth.co/docs/agents](https://trooth.co/docs/agents) gives, one per client.
+
+Claude Code:
+
+```bash
+claude mcp add --transport http trooth https://api.trooth.co/public/mcp
+```
+
+Codex, `~/.codex/config.toml`:
+
+```toml
+# or: codex mcp add trooth --url https://api.trooth.co/public/mcp
+[mcp_servers.trooth]
+url = "https://api.trooth.co/public/mcp"
+```
+
+Gemini CLI, `settings.json`. Use `httpUrl`: in the Gemini CLI, `url` is for servers that use server-sent events.
+
+```json
+{
+  "mcpServers": {
+    "trooth": {
+      "httpUrl": "https://api.trooth.co/public/mcp"
+    }
+  }
+}
+```
+
+Cursor, `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "trooth": {
+      "url": "https://api.trooth.co/public/mcp"
+    }
+  }
+}
+```
+
+VS Code, `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "trooth": {
+      "type": "http",
+      "url": "https://api.trooth.co/public/mcp"
+    }
+  }
+}
+```
 
 ## Tools
 
@@ -46,7 +103,30 @@ Eleven tools, all read only. Each answers with prose for a person and the same a
 | `trooth_ask` | Answers a question about Trooth itself from Trooth's fixed reference text. | 1 |
 | `trooth_my_company_record` | Your own workspace's record. Needs sign-in (OAuth). | 1 |
 
-Every fact carries one of four provenance words: witnessed, public record, attested or declared. Only the witness statement is signed on a record: Trooth signs witness statements and, for workspaces that create a delegation, delegation receipts and action evidence references; it does not sign the profile, its facts or a company's declarations. Three negatives are kept apart: no (the record holds a negative value), not_published (the company has not published it) and not_read (Trooth's reading did not read it). Resources include `trooth://company/{company}`, `trooth://buyer-questions`, `trooth://provenance-glossary` and `trooth://schema`; prompts are `vendor_trust_check`, `vendor_due_diligence`, `before_you_trust` and `verify_trust_token`.
+Every fact carries one of four provenance words: witnessed, public record, attested or declared. Only the witness statement is signed on a record: Trooth signs witness statements and, for workspaces that create a delegation, delegation receipts and action evidence references; it does not sign the profile, its facts or a company's declarations. Three negatives are kept apart: no (the record holds a negative value), not_published (the company has not published it) and not_read (Trooth's reading did not read it). ## Resources and prompts
+
+`resources/list` returns seven fixed resources, on every protocol revision the server supports:
+
+| Resource | What it holds |
+| --- | --- |
+| `trooth://buyer-questions` | The twelve buyer questions as JSON: each question ID, its wording, the record section it is answered from and its page anchor form. |
+| `trooth://methodology` | What witnessed means, how outside-in reads differ from signed evidence, and why Trooth never invents a number. |
+| `trooth://provenance-glossary` | The four provenance words and the three negatives: what each means on a company record and how to cite it. |
+| `trooth://provenance-labels` | Each provenance value this server returns, the value deprecated on 2026-09-26, and what a Trust Ledger Token's signatures cover. |
+| `trooth://schema` | The `outputSchema` of every tool, as one JSON document, with the address of the published company record schema. |
+| `trooth://verify-a-vendor` | A sequence of this server's tools an agent can use to look into a vendor before relying on it, and how to report what they return. |
+| `trooth://what-a-call-sends` | The arguments each tool sends, the request metadata that comes with them, what is counted and what is never kept. |
+
+`resources/templates/list` returns two templates, read live: `trooth://company/{company}` (one company's Trust Profile as Markdown) and `trooth://company/{company}/{section}` (one section of it).
+
+`prompts/list` returns four prompts. Each takes one argument.
+
+| Prompt | Argument | What it asks for |
+| --- | --- | --- |
+| `vendor_trust_check` | `company` | Look up a vendor's record on Trooth before relying on it, keeping each provenance label. |
+| `verify_trust_token` | `token` | Check the signatures on a Trust Ledger Token an agent has been handed. |
+| `vendor_due_diligence` | `company` | Read one company's answers to the twelve buyer questions, each cited with its provenance word and date, without a verdict. |
+| `before_you_trust` | `company` | A three-step look at a vendor for a procurement or integration decision, reported with provenance and without a verdict. |
 
 ## A sample call
 
@@ -105,6 +185,27 @@ A section a company left empty comes back as **not published**, never filled in.
 The server's protected-resource metadata is at `https://api.trooth.co/.well-known/oauth-protected-resource/public/mcp` (RFC 9728) and names Trooth's WorkOS AuthKit issuer. A client registers itself with that issuer and requests a token for `resource=https://api.trooth.co/public/mcp` (RFC 8707); no scope is required. The tool reads only the workspace linked to the person the token was issued for. The link is made when that person signs in to trooth.co once with Continue with enterprise SSO; until then the tool answers `not_linked`. A call without a token answers 401 with a `WWW-Authenticate` header naming the metadata. The token is never stored or forwarded.
 
 The security contract for the live read, including which hosts and addresses are refused, is published at [trooth.co/docs/agents#mcp-security-contract](https://trooth.co/docs/agents#mcp-security-contract).
+
+## Troubleshooting
+
+- **Fewer than seven resources, or a tool missing.** The server declares `listChanged: false`, so a client may keep the lists it read when it first connected, and a `2026-07-28` list result may be cached for its `ttlMs` (ten minutes). Remove the server and add it again, or start a new conversation, and the client lists again. To see what the server lists right now:
+
+  ```bash
+  curl -s https://api.trooth.co/public/mcp \
+    -H 'content-type: application/json' \
+    -H 'accept: application/json, text/event-stream' \
+    -H 'mcp-protocol-version: 2025-06-18' \
+    -d '{"jsonrpc":"2.0","id":1,"method":"resources/list","params":{}}'
+  ```
+
+- **The tools do not appear.** Check that trooth is turned on in the client's tools or connectors menu, then start a new chat. In VS Code, run **MCP: List Servers**, select trooth and choose **Show Output**.
+- **Two trooth servers listed.** Remove both (`claude mcp remove trooth`, `codex mcp remove trooth`, `gemini mcp remove trooth`, or delete the entry from the configuration file) and add it once.
+- **VS Code does not pick up the configuration.** The file is `.vscode/mcp.json` and its top-level key is `servers`. A block copied from Cursor or Claude Desktop uses `mcpServers`, which VS Code does not read.
+- **Gemini CLI cannot connect.** Use `httpUrl` in `settings.json`; `url` makes the Gemini CLI expect server-sent events.
+- **`405` on a `GET`.** The endpoint takes `POST` only. A client that only speaks the `2024-11-05` HTTP with server-sent events transport opens `https://api.trooth.co/public/mcp/sse` instead.
+- **HTTP `429`.** The caller used its 300 units for the minute. Wait the seconds in `Retry-After`, then retry.
+- **`401` from `trooth_my_company_record`.** The call carried no token, or one that is invalid or expired. Sign in again from the client; an invalid token gets `401` even on a public tool, so remove a stale one.
+- **`not_linked` from `trooth_my_company_record`.** Sign in to trooth.co once with Continue with enterprise SSO, using the same account, to link the workspace.
 
 ## This repository
 
