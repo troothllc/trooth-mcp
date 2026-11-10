@@ -7,7 +7,7 @@ Listing copy for the Trooth public MCP server, written for server `1.8.0` and re
 | Field | Value |
 | --- | --- |
 | Name | Trooth Network |
-| Server URL | `https://api.trooth.co/public/mcp` |
+| Server URL | `https://mcp.trooth.co` |
 | Transport | Streamable HTTP, JSON-RPC 2.0, `POST` only, no sessions |
 | Protocol revisions | `2026-07-28` (stateless), `2025-11-25`, `2025-06-18`, `2025-03-26`, `2024-11-05` |
 | Registry name | `io.github.troothllc/trooth-network` |
@@ -74,8 +74,8 @@ A reviewer needs no account. A call that always returns content: `trooth_ask` wi
 | Connector name (100 max) | Trooth Network |
 | Short description (55 max) | One public record per company, read by your AI. |
 | Long description (2,000 max) | The full description above. |
-| Server URL | `https://api.trooth.co/public/mcp` |
-| Authentication | No sign-in for ten tools. `trooth_my_company_record` uses OAuth through the authorization server named at `https://api.trooth.co/.well-known/oauth-protected-resource/public/mcp`; a call without a token answers 401 with `WWW-Authenticate`. |
+| Server URL | `https://mcp.trooth.co` |
+| Authentication | No sign-in for ten tools. `trooth_my_company_record` uses OAuth through the authorization server named at `https://mcp.trooth.co/.well-known/oauth-protected-resource`; a call without a token answers 401 with `WWW-Authenticate`. |
 | Tool titles and annotations | Present on every tool (see the table above). |
 | Large results | `trooth_public_trust_profile` sets `_meta["anthropic/maxResultSizeChars"]` to 200,000; `detail: "summary"` returns a short answer. |
 | Privacy policy | `https://trooth.co/docs/query-privacy` and `https://trooth.co/privacy` |
@@ -89,7 +89,7 @@ Smithery lists remote servers by URL. Use the shared values, plus:
 
 - Display name: Trooth Network
 - Description: the short description.
-- Connection: Streamable HTTP at `https://api.trooth.co/public/mcp`; no configuration fields.
+- Connection: Streamable HTTP at `https://mcp.trooth.co`; no configuration fields.
 - Authentication: none, except the one OAuth tool, which a Smithery client may leave unused.
 - Tools are read from `tools/list`; the table above is the copy to check against.
 
@@ -100,13 +100,13 @@ The listing is claimed through `glama.json` in this repository (maintainer `troo
 - Name: Trooth Network
 - Description: the full description.
 - Category: Security; Research; Developer Tools.
-- Hosting: remote, `https://api.trooth.co/public/mcp`.
+- Hosting: remote, `https://mcp.trooth.co`.
 - Support: `security@trooth.co`.
 
 ## mcp.so
 
 - Name: Trooth Network
-- URL: `https://api.trooth.co/public/mcp`
+- URL: `https://mcp.trooth.co`
 - Repository: `https://github.com/troothllc/trooth-mcp`
 - Description: the short description, then the tool table.
 - Tags: company records, vendor due diligence, trust, security, privacy, read only.
@@ -114,7 +114,7 @@ The listing is claimed through `glama.json` in this repository (maintainer `troo
 ## PulseMCP
 
 - Server name: Trooth Network
-- Remote endpoint: `https://api.trooth.co/public/mcp` (Streamable HTTP)
+- Remote endpoint: `https://mcp.trooth.co` (Streamable HTTP)
 - Registry name: `io.github.troothllc/trooth-network`
 - Summary: the short description.
 - Description: the full description.
