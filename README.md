@@ -1,14 +1,14 @@
 # trooth-mcp
 
-The Trooth Network over the Model Context Protocol. Read any company's public record from Claude, ChatGPT, Cursor, VS Code or any MCP client. No key, no account.
+One Trooth MCP server for the Trooth Network and Semanto. Read any company's public record from Claude, ChatGPT, Cursor, VS Code or any MCP client with no key or account; sign in once to work your own Trust Profile and run Semanto.
 
 [![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.troothllc%2Ftrooth--network-1A73E8)](https://registry.modelcontextprotocol.io) [![License: MIT](https://img.shields.io/badge/license-MIT-0B0B0B)](LICENSE) [![Docs](https://img.shields.io/badge/docs-trooth.co%2Fdocs%2Fagents-0B0B0B)](https://trooth.co/docs/agents)
 
 ```
-https://api.trooth.co/public/mcp
+https://mcp.trooth.co
 ```
 
-Trooth operates the Trooth Network: one public, machine-readable record per company, carrying its identity, products, commercial terms, people, documents, security and privacy posture, AI practices, procurement terms and relationships. Every item says who said it. It is Trooth's only product, and it is free.
+Trooth operates the Trooth Network: one public, machine-readable record per company, carrying its identity, products, commercial terms, people, documents, security and privacy posture, AI practices, procurement terms and relationships. Every item says who said it. Reading it is free.
 
 **Trooth witnesses and dates facts. It does not grade, rate or rank anyone.** No tool here returns a number that sums a company up.
 
@@ -20,10 +20,10 @@ Trooth operates the Trooth Network: one public, machine-readable record per comp
 | --- | --- |
 | Claude (claude.ai, Desktop, mobile) | Customize › Connectors › + › Add custom connector, paste the URL above, and choose No sign-in. |
 | ChatGPT | Trooth Network is listed in ChatGPT's app directory. To add the URL yourself, turn on Developer mode, then add it under Plugins. |
-| Claude Code | `claude mcp add --transport http trooth https://api.trooth.co/public/mcp` |
-| Codex | `codex mcp add trooth --url https://api.trooth.co/public/mcp`, or the `~/.codex/config.toml` block below. |
-| Gemini CLI | `gemini mcp add --transport http trooth https://api.trooth.co/public/mcp`, or the `settings.json` block below. |
-| Cursor | Add `"trooth": { "url": "https://api.trooth.co/public/mcp" }` under `mcpServers` in `.cursor/mcp.json`. |
+| Claude Code | `claude mcp add --transport http trooth https://mcp.trooth.co` |
+| Codex | `codex mcp add trooth --url https://mcp.trooth.co`, or the `~/.codex/config.toml` block below. |
+| Gemini CLI | `gemini mcp add --transport http trooth https://mcp.trooth.co`, or the `settings.json` block below. |
+| Cursor | Add `"trooth": { "url": "https://mcp.trooth.co" }` under `mcpServers` in `.cursor/mcp.json`. |
 | VS Code | Run **MCP: Add Server** and paste the URL above, or add the block below to a project's `.vscode/mcp.json` (VS Code's key is `servers`, not `mcpServers`). |
 
 Then ask in plain words: *"Read trooth.co's Trust Profile and tell me how it handles customer data."*
@@ -37,15 +37,15 @@ The same blocks [trooth.co/docs/agents](https://trooth.co/docs/agents) gives, on
 Claude Code:
 
 ```bash
-claude mcp add --transport http trooth https://api.trooth.co/public/mcp
+claude mcp add --transport http trooth https://mcp.trooth.co
 ```
 
 Codex, `~/.codex/config.toml`:
 
 ```toml
-# or: codex mcp add trooth --url https://api.trooth.co/public/mcp
+# or: codex mcp add trooth --url https://mcp.trooth.co
 [mcp_servers.trooth]
-url = "https://api.trooth.co/public/mcp"
+url = "https://mcp.trooth.co"
 ```
 
 Gemini CLI, `settings.json`. Use `httpUrl`: in the Gemini CLI, `url` is for servers that use server-sent events.
@@ -54,7 +54,7 @@ Gemini CLI, `settings.json`. Use `httpUrl`: in the Gemini CLI, `url` is for serv
 {
   "mcpServers": {
     "trooth": {
-      "httpUrl": "https://api.trooth.co/public/mcp"
+      "httpUrl": "https://mcp.trooth.co"
     }
   }
 }
@@ -66,7 +66,7 @@ Cursor, `.cursor/mcp.json`:
 {
   "mcpServers": {
     "trooth": {
-      "url": "https://api.trooth.co/public/mcp"
+      "url": "https://mcp.trooth.co"
     }
   }
 }
@@ -79,7 +79,7 @@ VS Code, `.vscode/mcp.json`:
   "servers": {
     "trooth": {
       "type": "http",
-      "url": "https://api.trooth.co/public/mcp"
+      "url": "https://mcp.trooth.co"
     }
   }
 }
@@ -133,7 +133,7 @@ Every fact carries one of four provenance words: witnessed, public record, attes
 One question asked of one company's record, exactly as the server answered it on 2026-10-17 (the `assurance_boundary` and `content_trust` blocks are cut here for length; every answer carries both).
 
 ```bash
-curl -s https://api.trooth.co/public/mcp \
+curl -s https://mcp.trooth.co \
   -H 'content-type: application/json' \
   -H 'accept: application/json, text/event-stream' \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"trooth_get_fact","arguments":{"company":"trooth.co","question":"q_data_location"}}}'
@@ -182,7 +182,7 @@ A section a company left empty comes back as **not published**, never filled in.
 
 ### Signing in, for `trooth_my_company_record`
 
-The server's protected-resource metadata is at `https://api.trooth.co/.well-known/oauth-protected-resource/public/mcp` (RFC 9728) and names Trooth's WorkOS AuthKit issuer. A client registers itself with that issuer and requests a token for `resource=https://api.trooth.co/public/mcp` (RFC 8707); no scope is required. The tool reads only the workspace linked to the person the token was issued for. The link is made when that person signs in to trooth.co once with Continue with enterprise SSO; until then the tool answers `not_linked`. A call without a token answers 401 with a `WWW-Authenticate` header naming the metadata. The token is never stored or forwarded.
+The server's protected-resource metadata is at `https://mcp.trooth.co/.well-known/oauth-protected-resource` (RFC 9728) and names connect.trooth.co as the authorization server. Adding the server to Claude opens connect.trooth.co: sign in with a confirmed address, choose a workspace, set permissions (Read, Write or Customize, for the Network and Semanto together), review and authorize, then back to the app. A call without a token to a tool that needs one answers 401 with a `WWW-Authenticate` header naming the metadata. A workspace's agent key (`Authorization: Bearer tra_...`) works without a sign-in.
 
 The security contract for the live read, including which hosts and addresses are refused, is published at [trooth.co/docs/agents#mcp-security-contract](https://trooth.co/docs/agents#mcp-security-contract).
 
@@ -191,7 +191,7 @@ The security contract for the live read, including which hosts and addresses are
 - **Fewer than seven resources, or a tool missing.** The server declares `listChanged: false`, so a client may keep the lists it read when it first connected, and a `2026-07-28` list result may be cached for its `ttlMs` (ten minutes). Remove the server and add it again, or start a new conversation, and the client lists again. To see what the server lists right now:
 
   ```bash
-  curl -s https://api.trooth.co/public/mcp \
+  curl -s https://mcp.trooth.co \
     -H 'content-type: application/json' \
     -H 'accept: application/json, text/event-stream' \
     -H 'mcp-protocol-version: 2025-06-18' \
@@ -202,7 +202,7 @@ The security contract for the live read, including which hosts and addresses are
 - **Two trooth servers listed.** Remove both (`claude mcp remove trooth`, `codex mcp remove trooth`, `gemini mcp remove trooth`, or delete the entry from the configuration file) and add it once.
 - **VS Code does not pick up the configuration.** The file is `.vscode/mcp.json` and its top-level key is `servers`. A block copied from Cursor or Claude Desktop uses `mcpServers`, which VS Code does not read.
 - **Gemini CLI cannot connect.** Use `httpUrl` in `settings.json`; `url` makes the Gemini CLI expect server-sent events.
-- **`405` on a `GET`.** The endpoint takes `POST` only. A client that only speaks the `2024-11-05` HTTP with server-sent events transport opens `https://api.trooth.co/public/mcp/sse` instead.
+- **`405` on a `GET`.** The endpoint takes `POST` only. A client that only speaks the `2024-11-05` HTTP with server-sent events transport opens `https://mcp.trooth.co/sse` instead.
 - **HTTP `429`.** The caller used its 300 units for the minute. Wait the seconds in `Retry-After`, then retry.
 - **`401` from `trooth_my_company_record`.** The call carried no token, or one that is invalid or expired. Sign in again from the client; an invalid token gets `401` even on a public tool, so remove a stale one.
 - **`not_linked` from `trooth_my_company_record`.** Sign in to trooth.co once with Continue with enterprise SSO, using the same account, to link the workspace.

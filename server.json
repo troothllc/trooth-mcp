@@ -2,10 +2,26 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.troothllc/trooth-network",
   "title": "Trooth",
-  "description": "Machine-Readable Company Profiles: find, search and read any company's Trust Profile, fact by fact.",
-  "version": "1.1.7",
+  "description": "Read any company's record on the Trooth Network, each fact labeled with who said it and when.",
+  "version": "1.2.0",
   "websiteUrl": "https://trooth.co",
   "icons": [
+    {
+      "src": "https://trooth.co/brand/trooth-badge-light-48.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "48x48"
+      ],
+      "theme": "light"
+    },
+    {
+      "src": "https://trooth.co/brand/trooth-badge-light-96.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "96x96"
+      ],
+      "theme": "light"
+    },
     {
       "src": "https://trooth.co/brand/trooth-badge-light-512.png",
       "mimeType": "image/png",
@@ -13,6 +29,22 @@
         "512x512"
       ],
       "theme": "light"
+    },
+    {
+      "src": "https://trooth.co/brand/trooth-badge-dark-48.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "48x48"
+      ],
+      "theme": "dark"
+    },
+    {
+      "src": "https://trooth.co/brand/trooth-badge-dark-96.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "96x96"
+      ],
+      "theme": "dark"
     },
     {
       "src": "https://trooth.co/brand/trooth-badge-dark-512.png",
@@ -30,7 +62,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://api.trooth.co/public/mcp"
+      "url": "https://mcp.trooth.co"
     }
   ]
 }
