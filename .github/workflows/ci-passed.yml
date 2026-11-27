@@ -1,0 +1,37 @@
+# Required by the organization ruleset "main: CI passed required" (2026-11-27). A pull request merges by
+# itself (auto-merge) once this check passes, as in trooth-web, trooth-cli and the Workers.
+name: CI passed
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-passed-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ci-passed:
+    name: CI passed
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Every JSON and YAML file parses
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess, sys, yaml
+          bad = 0
+          for f in subprocess.check_output(["git", "ls-files"], text=True).split():
+              p = pathlib.Path(f)
+              try:
+                  if p.suffix == ".json":
+                      json.loads(p.read_text())
+                  elif p.suffix in (".yml", ".yaml"):
+                      list(yaml.safe_load_all(p.read_text()))
+              except Exception as e:
+                  print(f"::error file={f}::{e}"); bad += 1
+          sys.exit(1 if bad else 0)
+          PY
