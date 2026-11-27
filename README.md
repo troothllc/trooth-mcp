@@ -2,7 +2,7 @@
 
 One Trooth MCP server for the Trooth Network and Semanto. Read any company's public record from Claude, ChatGPT, Cursor, VS Code or any MCP client with no key or account; sign in once to work your own Trust Profile and run Semanto.
 
-[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.troothllc%2Ftrooth--network-1A73E8)](https://registry.modelcontextprotocol.io) [![License: MIT](https://img.shields.io/badge/license-MIT-0B0B0B)](LICENSE) [![Docs](https://img.shields.io/badge/docs-trooth.co%2Fdocs%2Fagents-0B0B0B)](https://trooth.co/docs/agents)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-co.trooth%2Ftrooth-1A73E8)](https://registry.modelcontextprotocol.io) [![License: MIT](https://img.shields.io/badge/license-MIT-0B0B0B)](LICENSE) [![Docs](https://img.shields.io/badge/docs-trooth.co%2Fdocs%2Fagents-0B0B0B)](https://trooth.co/docs/agents)
 
 ```
 https://mcp.trooth.co
@@ -87,70 +87,71 @@ VS Code, `.vscode/mcp.json`:
 
 ## Tools
 
-39 tools in ten toolsets. `tools/list` shows the four default toolsets; `enable_toolset` adds a group, and `search_tools` finds any tool by what it does. Every tool answers by name whether or not its toolset is shown, and each carries a title and its read-only or destructive hint.
+`tools/list` shows 42 tools by default, read on 2026-11-27 from https://mcp.trooth.co. 12 of them change something and carry no read-only hint; the rest only read. `enable_toolset` adds a group, `search_tools` finds any tool by what it does, and `call_tool` (read-only tools) and `call_write_tool` (tools that change something) run a tool a client does not list. Every tool carries a title and its read-only or destructive hint.
 
 **Start with `trooth_setup`.** It answers the one next call to make for the whole guide, from proving the domain to checking the signed copy on your site. Call it again after each step.
 
 ### Start here
 
-| Tool | What it does |
-| --- | --- |
-| `trooth_setup` | Runs the whole guide one step at a time: prove the domain, read the site, fill the Trust Profile draft, review and sign, put the signed copy on the site, check it. |
-| `trooth_hub_sync` | Sends the signed facts to one listing hub (Google Business Profile or Merchant Center), after a preview and your approval. |
-| `trooth_verify` | Checks the two signatures on a Trust Ledger Token. |
-| `semanto_whoami` | Who this sign-in or key acts for. |
-| `semanto_status` | Where setup stands, and the next step. |
-| `semanto_guide` | What Semanto is and the order an agent runs it in. |
-| `enable_toolset` | Shows one more group of tools. |
-| `search_tools` | Finds a tool by what it does. |
+| Tool | What it does | Changes something |
+| --- | --- | --- |
+| `trooth_setup` | Set up Semanto and the Trust Profile, one step at a time. | no |
+| `trooth_hub_sync` | Send the signed facts to one listing hub. | yes |
+| `enable_toolset` | Show one more group of tools. | no |
+| `search_tools` | Find a tool by what it does. | no |
+| `call_tool` | Run a read-only tool by name. | no |
+| `call_write_tool` | Run a tool that changes something, by name. | yes |
+| `trooth_verify` | Check a signed copy or a Trust Ledger Token. | no |
+| `trooth_ask` | Ask about Trooth (the Trooth Network, what a record carries, pricing, methodology). | no |
+| `trooth_api_search` | Search the Trooth API by keyword. | no |
+| `trooth_api_details` | Read one Trooth API operation's parameters. | no |
+| `trooth_inspect` | What one object ID names and where it is stored. | no |
 
 ### Public record (no account)
 
-| Tool | What it reads |
-| --- | --- |
-| `trooth_resolve_company` | Finds the record for a domain, web address, Trooth slug or name, with why it matched; several matches come back as candidates, none chosen. |
-| `trooth_search_companies` | Searches the Network by name, domain, tagline or category. |
-| `trooth_list_companies` | Lists companies by industry, data region, witnessed or not, and claimed or unclaimed. |
-| `trooth_public_trust_profile` | One company's complete Trust Profile, section by section. |
-| `trooth_get_fact` | One buyer question answer or one fact, with its provenance word, date and anchor. |
-| `trooth_company_changes` | How a record changed, optionally since a date. |
-| `trooth_ai_data_use_disclosures` | What a company has declared about AI and customer data. |
-| `trooth_outside_in_read` | A live read of a domain's public HTTPS surface and `security.txt`, taken when called. |
-| `trooth_ask` | Answers a question about Trooth itself from Trooth's fixed reference text. |
-| `semanto_page` | One page of a company's signed copy as markdown. |
-| `semanto_facts` | A company's signed facts as JSON-LD. |
-| `semanto_verify` | Checks a page against the current signed version. |
+| Tool | What it does | Changes something |
+| --- | --- | --- |
+| `trooth_ai_data_use_disclosures` | Read a company's published AI and data-use declarations. | no |
+| `trooth_company_changes` | Read how a company's record changed. | no |
+| `trooth_get_fact` | Read one fact or buyer question from a company's record. | no |
+| `trooth_list_companies` | List companies on the Trooth Network by published facts. | no |
+| `trooth_outside_in_read` | Live read of a domain's HTTPS and response headers. | no |
+| `trooth_public_trust_profile` | Read a company's complete Trust Profile. | no |
+| `trooth_resolve_company` | Find a company's Trooth Network record. | no |
+| `trooth_search_companies` | Search the Trooth Network for companies. | no |
+| `trooth_semanto_page` | Read one signed page. | no |
+| `trooth_semanto_facts` | A company's signed facts. | no |
+| `trooth_semanto_answer` | Answer a question from a company's signed record. | no |
+| `trooth_semanto_statement_check` | Check a statement against the signed record. | no |
 
 ### Trust Profile (sign-in)
 
-| Tool | What it does |
-| --- | --- |
-| `trooth_my_company_record` | Your own workspace's company record. |
-| `trooth_profile_get` | Reads your Trust Profile draft. |
-| `trooth_profile_checklist` | What is left before your Trust Profile is published. |
-| `trooth_profile_validate` | Checks changes and the publish rules without saving. |
-| `trooth_profile_remediation_plan` | Plans the changes that close the open checklist items. |
-| `trooth_profile_update` | Changes fields of the draft; the public page changes only on publish. |
-| `trooth_profile_import` | Reads pages of your own website into the draft, blank fields only, each value with its page. |
-| `trooth_profile_diff` | Where the draft and the published page differ. |
-| `trooth_profile_domain_start` | Starts proving your company's domain. |
-| `trooth_profile_domain_check` | Checks the domain proof. |
-| `trooth_profile_publish` | Publishes the draft. Waits for a person to approve it. |
+| Tool | What it does | Changes something |
+| --- | --- | --- |
+| `trooth_my_company_record` | Read the caller's own workspace's company record. | no |
+| `trooth_profile_checklist` | List what is left before the workspace's Trust Profile is published. | no |
+| `trooth_profile_diff` | Show where the workspace's Trust Profile draft and published page differ. | no |
+| `trooth_profile_domain_check` | Check the company's domain proof. | yes |
+| `trooth_profile_domain_start` | Start proving the company's domain. | yes |
+| `trooth_profile_get` | Read the workspace's Trust Profile draft. | no |
+| `trooth_profile_import` | Import a page of the company's website into the workspace's Trust Profile draft. | yes |
+| `trooth_profile_publish` | Publish the workspace's Trust Profile draft. | yes |
+| `trooth_profile_remediation_plan` | Plan the changes that close the open checklist items. | no |
+| `trooth_profile_update` | Change fields of the workspace's Trust Profile draft. | yes |
+| `trooth_profile_validate` | Check changes and the publish rules without saving. | no |
 
 ### Semanto (sign-in)
 
-| Tool | What it does |
-| --- | --- |
-| `semanto_setup_read_again` | Reads the website again. |
-| `semanto_setup_choose` | Chooses Basic or the full signed copy. |
-| `semanto_review_get` | The facts to review, each with the page it came from. |
-| `semanto_setup_confirm` | Confirms the reviewed version. |
-| `semanto_sign` | Signs and publishes the signed copy. |
-| `semanto_pages_changed` | Pages changed since the read. |
-| `semanto_install_guide` | How to put the signed copy on your site. |
-| `semanto_install_check` | Checks your site. |
-
-The other six toolsets (Developer, Team and governance, Commerce, Reports, Evidence and monitoring, and Semanto, every tool) are added with `enable_toolset`.
+| Tool | What it does | Changes something |
+| --- | --- | --- |
+| `trooth_semanto_status` | Setup status and next step. | no |
+| `trooth_semanto_setup_read_again` | Read the website again. | yes |
+| `trooth_semanto_setup_choose` | Choose Basic or the full signed copy. | yes |
+| `trooth_semanto_review_get` | The facts to review. | no |
+| `trooth_semanto_setup_confirm` | Confirm the reviewed version. | yes |
+| `trooth_semanto_sign` | Sign and publish. | yes |
+| `trooth_semanto_install_guide` | How to put it on the site. | no |
+| `trooth_semanto_install_check` | Check my site. | yes |
 
 Every fact carries one of four provenance words: witnessed, public record, attested or declared. Only the witness statement is signed on a record: Trooth signs witness statements and, for workspaces that create a delegation, delegation receipts and action evidence references; it does not sign the profile, its facts or a company's declarations. Three negatives are kept apart: no (the record holds a negative value), not_published (the company has not published it) and not_read (Trooth's reading did not read it). A signature proves who said a fact, not that it is true.
 
@@ -233,7 +234,7 @@ A section a company left empty comes back as **not published**, never filled in.
 
 ### Signing in
 
-The server's protected-resource metadata is at `https://mcp.trooth.co/.well-known/oauth-protected-resource` (RFC 9728) and names connect.trooth.co as the authorization server. Adding the server to Claude opens connect.trooth.co: sign in with a confirmed address, choose a workspace, set permissions (Read, Write or Customize, for the Network and Semanto together), review and authorize, then back to the app. A call without a token to a tool that needs one answers 401 with a `WWW-Authenticate` header naming the metadata. A workspace's agent key (`Authorization: Bearer tra_...`) works without a sign-in.
+The server's protected-resource metadata is at `https://mcp.trooth.co/.well-known/oauth-protected-resource` (RFC 9728) and names connect.trooth.co as the authorization server. Adding the server to Claude opens connect.trooth.co: sign in with a confirmed address, choose a workspace, set permissions (Read, Write or Customize, for the Network and Semanto together), review and authorize, then back to the app. A call without a token to a tool that needs one answers 401 with a `WWW-Authenticate` header naming the metadata. A workspace's agent key (`Authorization: Bearer tra_YOUR_AGENT_KEY`) works without a sign-in.
 
 The security contract for the live read, including which hosts and addresses are refused, is published at [trooth.co/docs/agents#mcp-security-contract](https://trooth.co/docs/agents#mcp-security-contract).
 
@@ -260,9 +261,9 @@ The security contract for the live read, including which hosts and addresses are
 
 ## This repository
 
-A license, this README, `server.json`, `docs/directory-submissions.md` (listing copy for the MCP directories), the manifest published to the official MCP Registry as `io.github.troothllc/trooth-network`, and `glama.json`, which names the maintainers of the Glama directory listing. The server itself runs at `https://mcp.trooth.co`; there is nothing here to install. The two older addresses, `api.trooth.co/public/mcp` and `api.trooth.co/os/semanto/mcp`, answer 404 with the new address, and the registry record `co.trooth/semanto` is deprecated in favor of this one.
+A license, this README, `server.json`, `docs/directory-submissions.md` (listing copy for the MCP directories) and `glama.json`, which names the maintainers of the Glama directory listing. The server itself runs at `https://mcp.trooth.co`; there is nothing here to install.
 
-`server.json` in this repository is version `1.2.0`, written for server `1.8.0`. The registry manifest and the running server carry separate version numbers: the server reports its own in `serverInfo`.
+`server.json` is a copy of the record the official MCP Registry serves as `co.trooth/trooth` (version 2.0.0, read 2026-11-27). That record is published under the trooth.co domain namespace, outside this repository. The older records `io.github.troothllc/trooth-network` and `co.trooth/semanto` are deprecated in favor of it, and the two older addresses, `api.trooth.co/public/mcp` and `api.trooth.co/os/semanto/mcp`, answer 404 with the new address. The registry record and the running server carry separate version numbers: the server reports its own in `serverInfo`.
 
 ## Related
 
