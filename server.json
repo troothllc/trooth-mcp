@@ -1,10 +1,10 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.troothllc/trooth-network",
+  "name": "co.trooth/trooth",
+  "description": "Every company's public record on the Trooth Network, and Semanto: a company's website, signed.",
   "title": "Trooth",
-  "description": "Read any company's record on the Trooth Network, each fact labeled with who said it and when.",
-  "version": "1.2.0",
-  "websiteUrl": "https://trooth.co",
+  "version": "2.0.0",
+  "websiteUrl": "https://trooth.co/docs/mcp",
   "icons": [
     {
       "src": "https://trooth.co/brand/trooth-badge-light-48.png",
@@ -55,14 +55,95 @@
       "theme": "dark"
     }
   ],
-  "repository": {
-    "url": "https://github.com/troothllc/trooth-mcp",
-    "source": "github"
-  },
   "remotes": [
     {
       "type": "streamable-http",
       "url": "https://mcp.trooth.co"
     }
-  ]
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "co.trooth/docs": "https://trooth.co/docs/mcp",
+      "co.trooth/publisher": {
+        "name": "Trooth, LLC",
+        "url": "https://trooth.co"
+      },
+      "co.trooth/replaces": [
+        {
+          "name": "io.github.troothllc/trooth-network",
+          "points_to": "co.trooth/trooth",
+          "status": "deprecated",
+          "until": "2027-11-14"
+        },
+        {
+          "name": "co.trooth/semanto",
+          "points_to": "co.trooth/trooth",
+          "status": "deprecated",
+          "until": "2027-11-14"
+        }
+      ],
+      "co.trooth/toolsets": [
+        {
+          "default": true,
+          "id": "start",
+          "title": "Start here",
+          "what": "trooth_setup, trooth_hub_sync, trooth_verify, setup status, enable_toolset, search_tools, call_tool (read-only tools) and call_write_tool (tools that change something)."
+        },
+        {
+          "default": true,
+          "id": "public_record",
+          "title": "Public record",
+          "what": "Find a company and read its public record, one fact or its changes. No account."
+        },
+        {
+          "default": true,
+          "id": "trust_profile",
+          "title": "Trust Profile",
+          "what": "Read, change, check and publish your own Trust Profile, and prove your domain."
+        },
+        {
+          "default": true,
+          "id": "semanto",
+          "title": "Semanto",
+          "what": "Read the site, review and sign the facts, put the signed copy on the site and check it."
+        },
+        {
+          "default": false,
+          "id": "developer",
+          "title": "Developer",
+          "what": "The whole API (trooth_api_search, trooth_api_details, trooth_api_read, trooth_api_write), API keys, agent keys, webhooks, events, apps, Semanto connectors and signing keys."
+        },
+        {
+          "default": false,
+          "id": "team",
+          "title": "Team and governance",
+          "what": "Team, roles, delegations, sessions, settings, notifications, the audit log, Semanto company settings and Google."
+        },
+        {
+          "default": false,
+          "id": "commerce",
+          "title": "Commerce",
+          "what": "Buyers, attestations, reach, updates, media, Semanto credentials, recalls and seller lists."
+        },
+        {
+          "default": false,
+          "id": "reports",
+          "title": "Reports",
+          "what": "Semanto reports, benchmarks and reader exports."
+        },
+        {
+          "default": false,
+          "id": "evidence",
+          "title": "Evidence and monitoring",
+          "what": "Connected sources, stack fixes, monitoring, evidence and documents."
+        },
+        {
+          "default": false,
+          "id": "semanto_more",
+          "title": "Semanto, every tool",
+          "what": "The rest of Semanto: listings and write-back, versions, the public log, keys and setup extras."
+        }
+      ]
+    }
+  }
 }
